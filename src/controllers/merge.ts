@@ -1,9 +1,12 @@
 import { Request, Response } from 'express'
+import { PDFDocument } from 'pdf-lib'
 
-export default class MergeFrontBack {
+export default class Merge {
   async handle(req: Request, res: Response) {
     try {
-      return res.send('merge-front-back')
+      const pdfDoc = await PDFDocument.create()
+
+      return res.send('merge')
     } catch (error) {
       console.log(error)
     }

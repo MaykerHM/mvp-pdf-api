@@ -1,6 +1,10 @@
 import express from 'express'
-import { MergeFrontBack } from '../controllers/merge-front-back'
+import fg from 'fast-glob'
 
 export const pdfRoutes = express.Router()
 
-pdfRoutes.get('/', new MergeFrontBack().handle)
+fg.sync('**/src/controllers/**.ts').map(async (file) => {
+    const controller = (await import(`../../${file}`)).default
+    const fileName = file.split('/')[2].split('.')[0]
+    pdfRoutes.use(`/${fileName}`,new controller().handle)
+})
