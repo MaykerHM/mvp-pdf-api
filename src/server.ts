@@ -1,6 +1,5 @@
 import app from './config/app'
 import cors from 'cors'
-import express from 'express'
 import { pdfRoutes } from './routes/pdfRoute'
 
 app.get('/', (req, res) => {
@@ -8,5 +7,4 @@ app.get('/', (req, res) => {
 })
 
 app.use(cors())
-app.use(express.json())
 app.use('/api', pdfRoutes)
