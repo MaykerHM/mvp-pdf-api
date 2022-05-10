@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { PDFDocument } from 'pdf-lib'
 import fs from 'fs'
+import { promisify } from 'util'
 import { Readable } from 'stream'
 
 export default class Merge {
@@ -8,15 +9,19 @@ export default class Merge {
     try {
       const files = req.files as Express.Multer.File[]
       const mergedPdf = await PDFDocument.create()
+      const unlinkAsync = promisify(fs.unlink)
 
-      files.map(async (file) => {
+      for (const file of files) {
         const pdf = await PDFDocument.load(fs.readFileSync(file.path))
-        await mergedPdf.copyPages(pdf, pdf.getPageIndices())
-      })
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices())
+        copiedPages.forEach((page) => mergedPdf.addPage(page))
+        await unlinkAsync(file.path)
+      }
 
-      const mergedPdfFile = await mergedPdf.save()
+      const mergedPdfFile = await mergedPdf.save({
+        updateFieldAppearances: true,
+      })
       res.setHeader('Content-Disposition', 'inline; filename="mergedPDF.pdf"')
-      res.setHeader('Content-Length', mergedPdfFile.buffer.byteLength)
       res.setHeader('Content-Type', 'application/pdf')
       let stream = new Readable()
       stream.push(mergedPdfFile)
