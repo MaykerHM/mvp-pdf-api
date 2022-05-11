@@ -21,12 +21,12 @@ export default class MergeFrontBack {
         pdfBack,
         pdfBack.getPageIndices()
       )
-
+      const reversedCopiedBackPages = copiedBackPages.reverse()
       const sheetsAmount = copiedFrontPages.length
 
       for (let sheetNumber = 0; sheetNumber < sheetsAmount; sheetNumber++) {
         mergedPdf.addPage(copiedFrontPages[sheetNumber])
-        mergedPdf.addPage(copiedBackPages[sheetNumber])
+        mergedPdf.addPage(reversedCopiedBackPages[sheetNumber])
       }
 
       await unlinkAsync(files[0].path)
